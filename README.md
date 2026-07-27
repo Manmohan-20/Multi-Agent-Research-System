@@ -158,16 +158,6 @@ python pipeline.py
 
 ---
 
-## 🗺️ Roadmap ideas
-
-- [ ] Swap the single-reader-agent scrape step for multi-URL parallel scraping
-- [ ] Add a retrieval/RAG layer over previously generated reports
-- [ ] Support additional LLM providers (OpenAI, Anthropic) via a model-agnostic config
-- [ ] Add PDF export alongside Markdown/TXT
-- [ ] Persist session history to disk/DB instead of in-memory state
-
----
-
 ## 📄 License
 
 MIT — see [LICENSE](LICENSE) for details.
