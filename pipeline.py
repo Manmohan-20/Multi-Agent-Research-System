@@ -17,6 +17,30 @@ def _notify(on_step, step: str, status: str, detail: str = ""):
         on_step(step, status, detail)
 
 
+def _message_text(content) -> str:
+    """Normalize a LangChain message's .content into plain text.
+
+    Depending on the model/provider, .content can be a plain string or a
+    list of content blocks (e.g. [{"type": "text", "text": "..."}]).
+    Everything downstream in this pipeline (slicing, f-strings, the
+    Streamlit source parser) expects a string, so this is the single
+    place that guarantees one.
+    """
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for block in content:
+            if isinstance(block, str):
+                parts.append(block)
+            elif isinstance(block, dict):
+                text = block.get("text") or block.get("content") or ""
+                if isinstance(text, str):
+                    parts.append(text)
+        return "\n".join(parts)
+    return str(content) if content is not None else ""
+
+
 def run_research_pipeline(topic: str, on_step=None) -> dict:
     """
     Executes the full multi-agent research pipeline.
@@ -40,7 +64,7 @@ def run_research_pipeline(topic: str, on_step=None) -> dict:
         search_result = search_agent.invoke({
             "messages": [("user", f"Find recent, reliable and detailed information about: {topic}")]
         })
-        state["search_results"] = search_result['messages'][-1].content
+        state["search_results"] = _message_text(search_result['messages'][-1].content)
     except Exception as e:
         _notify(on_step, "search", "error", str(e))
         raise PipelineError("search", f"The search agent failed: {e}") from e
@@ -65,7 +89,7 @@ def run_research_pipeline(topic: str, on_step=None) -> dict:
                 f"Search Results:\n{state['search_results'][:800]}"
             )]
         })
-        state['scraped_content'] = reader_result['messages'][-1].content
+        state['scraped_content'] = _message_text(reader_result['messages'][-1].content)
     except Exception as e:
         _notify(on_step, "scrape", "error", str(e))
         raise PipelineError("scrape", f"The reader agent failed: {e}") from e

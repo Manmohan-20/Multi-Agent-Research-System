@@ -119,7 +119,7 @@ def render_footer():
     _md("""
         <div class="nx-footer">
             Made with ❤️ using Streamlit &nbsp;·&nbsp;
-            <a href="https://github.com" target="_blank">GitHub Repository</a> &nbsp;·&nbsp;
+            <a href="https://github.com/Manmohan-20/Multi-Agent-Research-System" target="_blank">GitHub Repository</a> &nbsp;·&nbsp;
             v1.0.0 &nbsp;·&nbsp; MIT License
         </div>
         """)

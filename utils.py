@@ -13,12 +13,18 @@ from urllib.parse import urlparse
 from typing import List, Dict
 
 
-def parse_sources(search_results_text: str) -> List[Dict[str, str]]:
+def parse_sources(search_results_text) -> List[Dict[str, str]]:
     """Turn the raw 'Title: ... URL: ... Snippet: ...' blob from web_search
     into a list of {title, url, domain, snippet} dicts for the sources panel.
     """
     if not search_results_text:
         return []
+    if not isinstance(search_results_text, str):
+        # Defensive: some LangChain/model combinations can hand back a list
+        # of content blocks instead of a plain string.
+        search_results_text = "\n".join(
+            b if isinstance(b, str) else str(b) for b in search_results_text
+        ) if isinstance(search_results_text, list) else str(search_results_text)
 
     blocks = [b.strip() for b in search_results_text.split("----") if b.strip()]
     sources = []
@@ -53,6 +59,8 @@ def extract_all_urls(*texts: str) -> List[str]:
     for text in texts:
         if not text:
             continue
+        if not isinstance(text, str):
+            text = str(text)
         for url in re.findall(r"https?://[^\s\)\]\"'>]+", text):
             clean = url.rstrip(").,;:")
             if clean not in seen:

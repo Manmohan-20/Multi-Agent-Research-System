@@ -108,15 +108,6 @@ def stop_research():
     ui_log("Stop requested — finishing the current stage, then halting.")
 
 
-def clear_session():
-    st.session_state.current_topic = ""
-    st.session_state.current_result = None
-    st.session_state.current_error = None
-    st.session_state.step_status = {k: "idle" for k in STEP_KEYS}
-    st.session_state.logs = []
-    st.session_state.topic_input = ""
-
-
 def ui_log(message: str):
     st.session_state.logs.append(message)
 
@@ -183,7 +174,7 @@ with st.sidebar:
     st.caption("A multi-agent research system: a search agent, a reader agent, "
                "a writer, and a critic collaborate on every report.")
 
-    st.link_button("⭐ View on GitHub", "https://github.com", use_container_width=True)
+    st.link_button("⭐ View on GitHub", "https://github.com/Manmohan-20/Multi-Agent-Research-System", use_container_width=True)
 
     st.markdown("---")
     with st.expander("⚙️ Settings & model", expanded=False):
@@ -251,7 +242,7 @@ with st.container():
             label_visibility="collapsed",
             disabled=st.session_state.running,
         )
-        b1, b2, b3 = st.columns([2, 1, 1])
+        b1, b2 = st.columns([3, 1])
         with b1:
             start_clicked = st.form_submit_button(
                 "🚀 Start Research", use_container_width=True, type="primary",
@@ -260,10 +251,6 @@ with st.container():
         with b2:
             stop_clicked = st.form_submit_button(
                 "⏹ Stop", use_container_width=True, disabled=not st.session_state.running,
-            )
-        with b3:
-            clear_clicked = st.form_submit_button(
-                "🧹 Clear", use_container_width=True, disabled=st.session_state.running,
             )
 
     st.markdown('</div>', unsafe_allow_html=True)
@@ -274,10 +261,6 @@ if start_clicked:
 
 if stop_clicked:
     stop_research()
-
-if clear_clicked:
-    clear_session()
-    st.rerun()
 
 if st.session_state.current_error and st.session_state.current_error[0] == "validation":
     st.warning(st.session_state.current_error[1])
